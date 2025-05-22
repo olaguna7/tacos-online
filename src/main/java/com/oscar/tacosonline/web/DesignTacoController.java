@@ -25,49 +25,56 @@ import java.util.stream.Collectors;
 @SessionAttributes("order")
 public class DesignTacoController {
 
-    @Autowired
-    private IngredientRepository ingredientRepository;
+    private IngredientRepository ingredientRepo;
 
-    @Autowired
-    private TacoRepository tacoRepository;
+    private TacoRepository tacoRepo;
+
+    public DesignTacoController(IngredientRepository ingredientRepo, TacoRepository tacoRepo) {
+        this.ingredientRepo = ingredientRepo;
+        this.tacoRepo = tacoRepo;
+    }
 
     @GetMapping
-    public String showDesignForm(Model model) {
+    public String showDesignForm(Model model){
+//        int x = 0;
+//        int y = 1/x;
         fillIngredients(model);
-        // model.addAttribute("tktn", new Taco());
+        //model.addAttribute("tktn", new Taco());
         return "design";
     }
 
-    @ModelAttribute(name = "tktn")
-    public Taco taco() {
-        log.info("Iniciando taco");
+    @ModelAttribute(name="tktn")
+    public Taco taco(){
+        log.info("Iniciando Taco");
         return new Taco();
     }
 
     @ModelAttribute
-    public Order order() {
-        log.info("Iniciando orden");
+    public Order order(){
+        log.info("Iniciando Taco");
         return new Order();
     }
 
+
     private List<Ingredient> filterByType(List<Ingredient> ingredients, Type type) {
-        return ingredients
-                .stream()
-                .filter(ingredient -> ingredient.getType() == type).collect(Collectors.toList());
+        return ingredients.stream().filter(ingredient -> ingredient.getType().equals(type)).collect(Collectors.toList());
     }
 
     @PostMapping
-    public String processDesign(@Valid @ModelAttribute(name="tktn") Taco design, Errors errors, Model model, @ModelAttribute Order order) {
-        if (errors.hasErrors()) {
+    public String processDesign(@Valid @ModelAttribute(name="tktn") Taco design, Errors errors, Model model, @ModelAttribute Order order){
+        if(errors.hasErrors()){
             fillIngredients(model);
             return "design";
         }
-        Taco saved = tacoRepository.save(design);
-        log.info("Processing Design Taco: " + saved);
+
+        Taco saved = tacoRepo.save(design);
+        log.info("Processing Design Taco: "+saved);
 
         order.addDesign(design);
+
         return "redirect:/orders/current";
     }
+
 
     public void fillIngredients(Model model){
 //        List<Ingredient> ingredients = Arrays.asList(
@@ -84,10 +91,9 @@ public class DesignTacoController {
 //        );
 
         List<Ingredient> ingredients = new ArrayList<>();
-        ingredientRepository.findAll().forEach(ingredients::add);
+        ingredientRepo.findAll().forEach(ingredients::add);
 
         Ingredient.Type[] types = Ingredient.Type.values();
-
         for(Ingredient.Type type : types){
             model.addAttribute(type.toString().toLowerCase(), filterByType(ingredients, type));
         }
