@@ -1,5 +1,5 @@
 create table if not exists Ingredient (
-  id varchar(4) not null,
+  id varchar(4) not null primary key,
   name varchar(25) not null,
   type varchar(10) not null
 );
@@ -37,3 +37,26 @@ create table if not exists Taco_Order_Tacos (
   foreign key (order_id) references Taco_Order(id),
   foreign key (tacos_id) references Taco(id)
 );
+
+
+create table if not exists Usuario (
+    id identity,
+    email varchar(25) not null,
+    username varchar(25) not null,
+    password varchar(255) not null,
+    name varchar(10) not null
+);
+
+create table if not exists Roles (
+    id identity,
+    name varchar(50) not null
+);
+
+create table if not exists Usuario_Roles (
+    user_id bigint not null,
+    role_id bigint not null
+);
+
+alter table Usuario_Roles add foreign key (user_id) references Usuario(id);
+alter table Usuario_Roles add foreign key (role_id) references Roles(id);
+

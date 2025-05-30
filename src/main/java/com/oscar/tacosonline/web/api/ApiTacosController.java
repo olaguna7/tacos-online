@@ -11,11 +11,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 @RestController
-@RequestMapping(path="/api", produces = "application/json")
+@RequestMapping(path="/api/v1", produces = "application/json")
 @CrossOrigin(origins = "*")
 public class ApiTacosController {
 
@@ -34,10 +32,8 @@ public class ApiTacosController {
     @GetMapping("/tacos/{id}")
     public ResponseEntity<Taco> tacoById(@PathVariable("id") Long id){
         Optional<Taco> optTaco = tacoRepository.findById(id);
-        if(optTaco.isPresent()){
-            return new ResponseEntity<>(optTaco.get(), HttpStatus.OK);
-        }
-        return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+        return optTaco.map(taco -> new ResponseEntity<>(taco, HttpStatus.OK))
+                .orElseGet(() -> new ResponseEntity<>(null, HttpStatus.NOT_FOUND));
     }
 
     @PostMapping(path="/tacos", consumes="application/json")

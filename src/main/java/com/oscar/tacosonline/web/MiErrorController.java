@@ -31,7 +31,6 @@ public class MiErrorController implements ErrorController {
     }
 
 
-    @Override
     public String getErrorPath() {
         return "";
     }
